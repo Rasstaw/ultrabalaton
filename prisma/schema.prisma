@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  //LOCAL_DATABASE_URL="mongodb://localhost:27017/ultrbalaton"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userid             String              @id @default(auto()) @map("_id") @db.ObjectId
+  fullname           String
+  email              String              @unique
+  password           String
+  avatar             String?
+  createdAt          DateTime            @default(now())
+  fullName           String?
+  dateOfBirth        DateTime?
+  phone              String?
+  raceCategory       String?
+  teamId             String?             @db.ObjectId
+  team               Team?               @relation(fields: [teamId], references: [teamId])
+  role               Role                @default(PARTICIPANT)
+  sentMessages       Message[]           @relation("MessageSender")
+  chatSessionIds     String[]            @db.ObjectId
+  chatSessions       ChatSession[]       @relation("ChatSessionParticipant", fields: [chatSessionIds], references: [sessionId])
+  assignedSegments   TeamSegment[]       @relation("UserToSegments")
+  segmentAssignments SegmentAssignment[] @relation("UserAssignments")
+  userEvents         UserEvent[]
+  invitations        TeamInvitation[]    @relation // New field for tracking invitations
+}
+
+model Team {
+  teamId             String              @id @default(auto()) @map("_id") @db.ObjectId
+  teamName           String              @unique
+  members            User[]              @relation // Relation is managed in User model
+  event              Event?              @relation(fields: [eventId], references: [eventId])
+  eventId            String?             @db.ObjectId
+  segmentAssignments SegmentAssignment[] @relation("TeamAssignments")
+  teamSegments       TeamSegment[]       @relation(name: "TeamToSegments")
+  teamEvents         TeamEvent[]
+  invitations        TeamInvitation[]    @relation // This is the new field
+}
+
+model Event {
+  eventId    String      @id @default(auto()) @map("_id") @db.ObjectId
+  eventName  String
+  eventDate  DateTime
+  route      String // JSON string detailing the route, points of interest, etc.
+  teams      Team[] // Relation is managed in Team model
+  teamEvents TeamEvent[]
+  userEvents UserEvent[]
+}
+
+enum Role {
+  ADMIN
+  EVENT_ORGANIZER
+  TEAM_LEADER
+  PARTICIPANT
+}
+
+model Message {
+  messageId   String      @id @default(auto()) @map("_id") @db.ObjectId
+  sender      User        @relation("MessageSender", fields: [senderId], references: [userid])
+  senderId    String      @db.ObjectId
+  content     String
+  createdAt   DateTime    @default(now())
+  chatSession ChatSession @relation(fields: [sessionId], references: [sessionId])
+  sessionId   String      @db.ObjectId
+}
+
+model ChatSession {
+  sessionId      String    @id @default(auto()) @map("_id") @db.ObjectId
+  participants   User[]    @relation("ChatSessionParticipant", fields: [participantIds], references: [userid])
+  participantIds String[]  @db.ObjectId
+  messages       Message[]
+  createdAt      DateTime  @default(now())
+}
+
+model TeamSegment {
+  segmentId    String   @id @default(auto()) @map("_id") @db.ObjectId
+  teamId       String   @db.ObjectId
+  assignedTo   String   @db.ObjectId
+  segmentStart GeoPoint // Define as appropriate for your geo library
+  segmentEnd   GeoPoint // Define as appropriate for your geo library
+  createdAt    DateTime @default(now())
+
+  team Team @relation(name: "TeamToSegments", fields: [teamId], references: [teamId])
+  user User @relation(name: "UserToSegments", fields: [assignedTo], references: [userid])
+}
+
+type GeoPoint {
+  latitude  Float
+  longitude Float
+}
+
+model SegmentAssignment {
+  assignmentId String @id @default(auto()) @map("_id") @db.ObjectId
+  segmentId    String @db.ObjectId
+  userId       String @db.ObjectId
+  teamId       String @db.ObjectId
+
+  segment Segment @relation(fields: [segmentId], references: [segmentId])
+  user    User    @relation(name: "UserAssignments", fields: [userId], references: [userid])
+  team    Team    @relation(name: "TeamAssignments", fields: [teamId], references: [teamId])
+}
+
+model Segment {
+  segmentId        String              @id @default(auto()) @map("_id") @db.ObjectId
+  distance         Float
+  startingLocation String
+  arrivalLocation  String
+  name             String?
+  assignments      SegmentAssignment[]
+}
+
+model TeamEvent {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  teamId  String @db.ObjectId
+  eventId String @db.ObjectId
+  team    Team   @relation(fields: [teamId], references: [teamId])
+  event   Event  @relation(fields: [eventId], references: [eventId])
+
+  @@unique([teamId, eventId])
+}
+
+model UserEvent {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String @db.ObjectId
+  eventId String @db.ObjectId
+  user    User   @relation(fields: [userId], references: [userid])
+  event   Event  @relation(fields: [eventId], references: [eventId])
+
+  @@unique([userId, eventId])
+}
+
+model TeamInvitation {
+  invitationId String           @id @default(auto()) @map("_id") @db.ObjectId
+  teamId       String           @db.ObjectId
+  userId       String           @db.ObjectId
+  status       InvitationStatus
+  sentAt       DateTime         @default(now())
+  respondedAt  DateTime?
+
+  team Team @relation(fields: [teamId], references: [teamId])
+  user User @relation(fields: [userId], references: [userid])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
