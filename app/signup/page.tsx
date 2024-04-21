@@ -19,7 +19,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 
 import getSignUpTheme from "../components/register/getSignUpTheme/getSignUpTheme";

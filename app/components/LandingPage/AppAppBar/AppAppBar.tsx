@@ -13,7 +13,7 @@ import Drawer from "@mui/material/Drawer";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ToggleColorMode from "../ToggleColorMode/ToggleColorMode";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 
 interface AppAppBarProps {
