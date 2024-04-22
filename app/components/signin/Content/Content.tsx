@@ -51,8 +51,8 @@ export default function Content() {
       <Box sx={{ display: { xs: "none", md: "flex" } }}>
         <SitemarkIcon />
       </Box>
-      {items.map((item) => (
-        <Stack direction="row" gap={2}>
+      {items.map((item, index) => (
+        <Stack direction="row" gap={2} key={index}>
           {item.icon}
           <div>
             <Typography fontWeight="medium" gutterBottom>

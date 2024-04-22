@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { useTheme } from "@mui/system";
+import Image from "next/image";
 
 const userTestimonials = [
   {
@@ -140,9 +141,10 @@ export default function Testimonials() {
                   title={testimonial.name}
                   subheader={testimonial.occupation}
                 />
-                <img
+                <Image
                   src={logos[index]}
                   alt={`Logo ${index + 1}`}
+                  width={Number(logoStyle.width)} // Ensure width is a number
                   style={logoStyle}
                 />
               </Box>
