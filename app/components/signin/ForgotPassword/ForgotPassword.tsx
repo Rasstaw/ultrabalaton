@@ -36,7 +36,7 @@ export default function ForgotPassword({
       >
         <DialogContentText>
           Enter your account&apos;s email address, and we&apos;ll send you a
-          link to reset your password.
+          links to reset your password.
         </DialogContentText>
         <OutlinedInput
           autoFocus

@@ -49,6 +49,7 @@ schema.prisma
 
 # vercel
 .vercel
+.environment
 
 # typescript
 *.tsbuildinfo

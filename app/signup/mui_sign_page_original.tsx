@@ -28,7 +28,6 @@ import {
   GoogleIcon,
   FacebookIcon,
 } from "../components/register/CustomIcons/CustomIcons";
-import { constants } from "buffer";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -69,10 +68,6 @@ export default function Signup() {
     password: "",
   });
 
-  const toggleColorMode = () => {
-    setMode((prev) => (prev === "dark" ? "light" : "dark"));
-  };
-
   const [mode, setMode] = React.useState<PaletteMode>("light");
   const SignUpTheme = createTheme(getSignUpTheme(mode));
   const [emailError, setEmailError] = React.useState(false);
@@ -81,14 +76,13 @@ export default function Signup() {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
   const [fullNameError, setFullNameError] = React.useState(false);
   const [fullNameErrorMessage, setFullNameErrorMessage] = React.useState("");
-  let isValid = true;
 
-  const fullName = document.getElementById("fullName") as HTMLInputElement;
-  const email = document.getElementById("email") as HTMLInputElement;
-  const password = document.getElementById("password") as HTMLInputElement;
+  const validateInputs = () => {
+    const fullName = document.getElementById("fullName") as HTMLInputElement;
+    const email = document.getElementById("email") as HTMLInputElement;
+    const password = document.getElementById("password") as HTMLInputElement;
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    let isValid = true;
 
     if (!fullName.value || fullName.value.length < 1) {
       setFullNameError(true);
@@ -117,17 +111,24 @@ export default function Signup() {
       setPasswordErrorMessage("");
     }
 
-    if (isValid) {
-      try {
-        const response = await axios.post("/api/users/signup", user);
-        console.log(response.data);
+    return isValid;
+  };
 
-        router.push("/signin");
-      } catch (error: any) {
-        console.log("Signup failed", error.message);
+  const toggleColorMode = () => {
+    setMode((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
-        toast.error(error.message);
-      }
+  const HandleSubmit = async () => {
+    if (!validateInputs()) return;
+
+    try {
+      const response = await axios.post("/api/users/signup", user);
+      console.log("your account created successfuly!", response.data);
+      router.push("/signin");
+      <Link href="/signin"></Link>;
+    } catch (error: any) {
+      console.log("Signup failed", error.response?.data || error.message);
+      toast.error(error.response?.data?.error || "Failed to register.");
     }
   };
 
@@ -183,7 +184,7 @@ export default function Signup() {
             </Typography>
             <Box
               component="form"
-              onSubmit={handleSubmit}
+              onSubmit={HandleSubmit}
               noValidate
               sx={{ display: "flex", flexDirection: "column", gap: 2 }}
             >
@@ -248,13 +249,12 @@ export default function Signup() {
               />
               <Button
                 type="submit"
+                fullWidth
                 variant="contained"
-                color="primary"
-                size="small"
+                onSubmit={HandleSubmit}
               >
-                Signup
+                Sign up
               </Button>
-
               <Link href="/signin" passHref>
                 <Button variant="text" color="primary" size="small">
                   Already have an account? Sign in

@@ -13,7 +13,7 @@ import SignInCard from "../components/signin/SignInCard/SignInCard";
 import Content from "../components/signin/Content/Content";
 import Link from "next/link";
 
-export default function SignInPage() {
+export default function Signin() {
   const [mode, setMode] = React.useState<PaletteMode>("light");
   const SignInSideTheme = createTheme(getSignInSideTheme(mode));
 

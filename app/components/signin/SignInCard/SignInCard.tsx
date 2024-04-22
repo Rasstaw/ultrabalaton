@@ -8,11 +8,14 @@ import Divider from "@mui/material/Divider";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-
 import { styled } from "@mui/material/styles";
+
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
 import ForgotPassword from "../ForgotPassword/ForgotPassword";
 import {
@@ -39,12 +42,11 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export default function SignInCard() {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [open, setOpen] = React.useState(false);
-
+  const router = useRouter();
+  const [user, setUser] = React.useState({
+    email: "",
+    password: "",
+  });
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -53,20 +55,19 @@ export default function SignInCard() {
     setOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [emailError, setEmailError] = React.useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+  const [open, setOpen] = React.useState(false);
+  let isValid = true;
+
+  const email = document.getElementById("email") as HTMLInputElement;
+  const password = document.getElementById("password") as HTMLInputElement;
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
-
-  const validateInputs = () => {
-    const email = document.getElementById("email") as HTMLInputElement;
-    const password = document.getElementById("password") as HTMLInputElement;
-
-    let isValid = true;
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
@@ -86,7 +87,18 @@ export default function SignInCard() {
       setPasswordErrorMessage("");
     }
 
-    return isValid;
+    if (isValid) {
+      try {
+        const response = await axios.post("/api/users/signin", user);
+        console.log(response.data);
+
+        router.push("/profile");
+      } catch (error: any) {
+        console.log("Signin failed", error.message);
+
+        toast.error(error.message);
+      }
+    }
   };
 
   return (
@@ -128,6 +140,7 @@ export default function SignInCard() {
             variant="outlined"
             color={emailError ? "error" : "primary"}
             sx={{ ariaLabel: "email" }}
+            onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
         </FormControl>
         <FormControl>
@@ -138,14 +151,13 @@ export default function SignInCard() {
             }}
           >
             <FormLabel htmlFor="password">Password</FormLabel>
-            <Link
-              component="button"
+            <Button
               onClick={handleClickOpen}
-              variant="body2"
-              sx={{ alignSelf: "baseline" }}
+              variant="text"
+              sx={{ alignSelf: "baseline", p: 0, minWidth: 0 }}
             >
               Forgot your password?
-            </Link>
+            </Button>
           </Box>
           <TextField
             error={passwordError}
@@ -155,11 +167,11 @@ export default function SignInCard() {
             type="password"
             id="password"
             autoComplete="current-password"
-            autoFocus
             required
             fullWidth
             variant="outlined"
             color={passwordError ? "error" : "primary"}
+            onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
         </FormControl>
         <FormControlLabel
@@ -167,16 +179,16 @@ export default function SignInCard() {
           label="Remember me"
         />
         <ForgotPassword open={open} handleClose={handleClose} />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          onClick={validateInputs}
-        >
+        <Button type="submit" fullWidth variant="text">
           Sign in
         </Button>
-        <Link variant="body2" sx={{ alignSelf: "center" }}>
-          Don&apos;t have an account? Sign up
+        <Link href="/signup" passHref>
+          <Typography
+            variant="body2"
+            sx={{ alignSelf: "center", cursor: "pointer" }}
+          >
+            Don&apos;t have an account? Sign up
+          </Typography>
         </Link>
       </Box>
       <Divider>or</Divider>
