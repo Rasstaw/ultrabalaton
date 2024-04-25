@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<void | Response> {
   const reqBody = await request.json();
   const { fullName, email, password } = reqBody;
 
@@ -16,16 +16,16 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    //checking user
+    // Check if user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json({ message: "Email address is already in use." });
     }
 
-    const salt = await bcryptjs.genSalt(10);
-    const hashedPassword = await bcryptjs.hash(password, salt);
+    // Hash the password
+    const hashedPassword = await bcryptjs.hash(password, 10);
 
-    // Use Prisma to store the new user in the database
+    // Create the new user
     const newUser = await prisma.user.create({
       data: {
         fullName,
@@ -35,10 +35,14 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message: "your account is created please login",
+      message: "Your account is created. Please log in.",
       success: true,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }), { status: 500 };
+    console.error("Error creating user:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

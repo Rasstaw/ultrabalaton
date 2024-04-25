@@ -1,13 +1,12 @@
-// pages/api/signup.ts
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<void | Response> {
   const reqBody = await request.json();
   const { email, password } = reqBody;
 
@@ -19,42 +18,41 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    //checking user
+    // Check if user exists
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return NextResponse.json({ message: "no user with this email exists" });
+      return NextResponse.json({ message: "No user with this email exists" });
     }
 
+    // Validate password
     const validPassword = await bcryptjs.compare(password, user.password);
     if (!validPassword) {
-      const respose = NextResponse.json({
-        Message: "Incorrect username or password",
-      });
+      return NextResponse.json({ message: "Incorrect username or password" });
     }
 
-    //creating token data
+    // Creating token data
     const tokenData = {
       id: user.userid,
       fullName: user.fullName,
       email: user.email,
     };
 
-    //creating the token
+    // Creating the token
     const token = jwt.sign(tokenData, process.env.JWT_SECRET_KEY!, {
       expiresIn: "1d",
     });
 
-    const respose = NextResponse.json({
-      Message: "you are now loggedin",
+    // Setting token in cookies
+    const response = NextResponse.json({
+      message: "You are now logged in",
       success: true,
     });
-
-    respose.cookies.set("token", token, {
+    response.cookies.set("token", token, {
       httpOnly: true,
     });
 
-    return respose;
+    return response;
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }), { status: 500 };
+    return NextResponse.json({ error: error.message });
   }
 }
