@@ -1,10 +1,11 @@
-"use client";
+{
+  /** 
+  "use client";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { useTheme } from "@mui/system";
-import Image from "next/image";
 
 const whiteLogos = [
   "https://assets-global.website-files.com/61ed56ae9da9fd7e0ef0a967/6560628e8573c43893fe0ace_Sydney-white.svg",
@@ -48,20 +49,16 @@ export default function LogoCollection() {
       <Grid container justifyContent="center" sx={{ mt: 0.5, opacity: 0.6 }}>
         {logos.map((logo, index) => (
           <Grid item key={index}>
-            {logos.map((logo, index) => (
-              <Grid item key={index}>
-                <Image
-                  src={logo}
-                  alt={`Fake company number ${index + 1}`}
-                  width={Number(logoStyle.width)} // Ensure width is a number
-                  height={Number(logoStyle.height)} // Ensure height is a number
-                  style={logoStyle}
-                />
-              </Grid>
-            ))}
+            <img
+              src={logo}
+              alt={`Fake company number ${index + 1}`}
+              style={logoStyle}
+            />
           </Grid>
         ))}
       </Grid>
     </Box>
   );
+}
+*/
 }

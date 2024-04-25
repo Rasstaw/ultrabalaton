@@ -190,7 +190,6 @@ export default function Signup() {
               <FormControl>
                 <FormLabel htmlFor="fullName">fullName</FormLabel>
                 <TextField
-                  autoComplete="fullName"
                   name="fullName"
                   required
                   fullWidth

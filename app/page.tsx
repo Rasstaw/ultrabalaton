@@ -8,10 +8,10 @@ import Divider from "@mui/material/Divider";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import AppAppBar from "./components/LandingPage/AppAppBar/AppAppBar";
 import Hero from "./components/LandingPage/Hero/Hero";
-import LogoCollection from "./components/LandingPage/LogoCollection/LogoCollection";
+//import LogoCollection from "./components/LandingPage/LogoCollection/LogoCollection";
 import Highlights from "./components/LandingPage/Highlights/Highlights";
 import Features from "./components/LandingPage/Features/Features";
-import Testimonials from "./components/LandingPage/Testimonials/Testimonials";
+//import Testimonials from "./components/LandingPage/Testimonials/Testimonials";
 import FAQ from "./components/LandingPage/FAQ/FAQ";
 import Footer from "./components/LandingPage/Footer/Footer";
 import getLPTheme from "./components/LandingPage/getLPTheme/getLPTheme";
@@ -29,13 +29,13 @@ export default function LandingPage() {
     <ThemeProvider theme={LPtheme}>
       <CssBaseline />
       <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
+      <Features />
       <Hero />
       <Box sx={{ bgcolor: "background.default" }}>
-        <Features />
-        <Testimonials />
+        {/**<Testimonials />*/}
         <Highlights />
         <FAQ />
-        <LogoCollection />
+        {/**<LogoCollection /> */}
         <Footer />
       </Box>
     </ThemeProvider>

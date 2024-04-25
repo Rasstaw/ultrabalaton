@@ -1,5 +1,5 @@
-"use client";
-import * as React from "react";
+{
+  /** import * as React from "react";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
@@ -142,9 +142,10 @@ export default function Testimonials() {
                   subheader={testimonial.occupation}
                 />
                 <Image
+                  width= {64px}
+
                   src={logos[index]}
                   alt={`Logo ${index + 1}`}
-                  width={Number(logoStyle.width)} // Ensure width is a number
                   style={logoStyle}
                 />
               </Box>
@@ -154,4 +155,6 @@ export default function Testimonials() {
       </Grid>
     </Container>
   );
+}
+*/
 }
