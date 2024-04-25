@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
     if (!validPassword) {
       const respose = NextResponse.json({
         Message: "Incorrect username or password",
-        success: false,
       });
     }
 
@@ -41,7 +40,7 @@ export async function POST(request: NextRequest) {
     };
 
     //creating the token
-    const token = await jwt.sign(tokenData, process.env.JWT_SECRET_KEY!, {
+    const token = jwt.sign(tokenData, process.env.JWT_SECRET_KEY!, {
       expiresIn: "1d",
     });
 
