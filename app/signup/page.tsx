@@ -15,7 +15,7 @@ import { PaletteMode, Card as MuiCard } from "@mui/material";
 import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -75,43 +75,60 @@ export default function Signup() {
 
   const [mode, setMode] = React.useState<PaletteMode>("light");
   const SignUpTheme = createTheme(getSignUpTheme(mode));
+
+  const [email, setEmail] = useState("");
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
+
+  const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
+
+  const [fullName, setFullName] = React.useState("");
   const [fullNameError, setFullNameError] = React.useState(false);
   const [fullNameErrorMessage, setFullNameErrorMessage] = React.useState("");
-  let isValid = true;
 
-  const fullName = document.getElementById("fullName") as HTMLInputElement;
-  const email = document.getElementById("email") as HTMLInputElement;
-  const password = document.getElementById("password") as HTMLInputElement;
+  const [isValid, setIsValid] = useState(true);
+
+  useEffect(() => {
+    const fullNameInput = document.getElementById(
+      "fullName"
+    ) as HTMLInputElement;
+    const emailInput = document.getElementById("email") as HTMLInputElement;
+    const passwordInput = document.getElementById(
+      "password"
+    ) as HTMLInputElement;
+
+    if (fullNameInput) setFullName(fullNameInput.value);
+    if (emailInput) setEmail(emailInput.value);
+    if (passwordInput) setPassword(passwordInput.value);
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!fullName.value || fullName.value.length < 1) {
+    if (!fullName || fullName.length < 1) {
       setFullNameError(true);
       setFullNameErrorMessage("fullName is required.");
-      isValid = false;
+      setIsValid(false);
     } else {
       setFullNameError(false);
       setFullNameErrorMessage("");
     }
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage("Please enter a valid email address.");
-      isValid = false;
+      setIsValid(false);
     } else {
       setEmailError(false);
       setEmailErrorMessage("");
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password || password.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage("Password must be at least 6 characters long.");
-      isValid = false;
+      setIsValid(false);
     } else {
       setPasswordError(false);
       setPasswordErrorMessage("");

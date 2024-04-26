@@ -55,33 +55,34 @@ export default function SignInCard() {
     setOpen(false);
   };
 
+  const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
+
+  const [password, setPassword] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [open, setOpen] = React.useState(false);
-  let isValid = true;
 
-  const email = document.getElementById("email") as HTMLInputElement;
-  const password = document.getElementById("password") as HTMLInputElement;
+  const [open, setOpen] = React.useState(false);
+  const [isValid, setIsValid] = React.useState(true);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage("Please enter a valid email address.");
-      isValid = false;
+      setIsValid(false);
     } else {
       setEmailError(false);
       setEmailErrorMessage("");
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password || password.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage("Password must be at least 6 characters long.");
-      isValid = false;
+      setIsValid(false);
     } else {
       setPasswordError(false);
       setPasswordErrorMessage("");
